@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal } from 'antd';
 import axios from 'axios';
-import UserForm from './UserForm';
+import AddUserForm from './AddUserForm';
 import EditUserForm from './EditUserForm';
+import HomeButton from './HomeButton'; 
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -92,6 +93,7 @@ const UserList = () => {
         setAddModalOpen(true);
     };
 
+
     return(
         <>
             <Button type="primary" style={{ float: 'right' }} onClick={() => showAddModal() } >Add New User</Button>
@@ -100,11 +102,12 @@ const UserList = () => {
                 <p>Are you sure you want to delete {curUser.username}?</p>
             </Modal>
             <Modal title="Add User" open={isAddModalOpen} onCancel={handleCancel} footer={null}>
-                <UserForm/>
+                <AddUserForm />
             </Modal>
             <Modal title={"Edit User " + curUser.id} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
                 <EditUserForm req={curUser} />
             </Modal>
+            <HomeButton style={{ float: 'right' }} />
         </>
     );
 }

@@ -1,23 +1,9 @@
 from typing import Union
 
+from sqlalchemy.orm import base
+
 from pydantic import BaseModel
-
-
-class ItemBase(BaseModel):
-    title: str
-    description: Union[str, None] = None
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
-
+from datetime import date
 
 class UserBase(BaseModel):
     username: str
@@ -31,5 +17,18 @@ class User(UserBase):
     
     is_active: bool
 
+    class Config:
+        orm_mode = True
+        
+        
+class Employee(BaseModel):
+    email : str
+    firstName: str
+    lastName: str
+    dob: date
+    skillLevel: str
+    active: bool
+    age: int
+    
     class Config:
         orm_mode = True

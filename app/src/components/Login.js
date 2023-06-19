@@ -1,21 +1,28 @@
-import React from 'react'
-import { Button, App, Space } from 'antd';
-import UserForm from './UserForm';
+import React, { useState } from 'react'
+import { Button, Space, Modal } from 'antd';
+import LoginForm from './LoginForm';
+import AddUserForm from './AddUserForm';
 
 const Login = () => {
-    const { message } = App.useApp();
+    const [isModalOpen, setModalOpen] = useState(false);
 
-    const test = () => {
-        message.success('Success!');
-        console.log('Test. ');
+    const showModal = (record) => {
+        setModalOpen(true);
+    };
+
+    const handleCancel = () => {
+        setModalOpen(false);
     };
 
     return (
-        <Space direction="vertical" style={{ width: '100%', justifyContent: 'center' }}>
-            <UserForm/>
-            <Button type="primary" onClick={() => test()} >
-                Test
+        <Space direction="vertical" style={{ width: '100%', justify: 'center' , align:'middle'}}>
+            <LoginForm />
+            <Button type="primary" onClick={() => showModal()} >
+                Register
             </Button>
+            <Modal title="Add User" open={isModalOpen} onCancel={handleCancel} footer={null}>
+                <AddUserForm />
+            </Modal>
         </Space>
     );
 };

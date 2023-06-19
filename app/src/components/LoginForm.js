@@ -1,35 +1,37 @@
 import React from 'react'
-import { Button, /*Checkbox,*/ Form, Input, App } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { Button, Checkbox, Form, Input, App } from 'antd';
 import axios from 'axios';
 
-const UserForm = () => {
+const LoginForm = () => {
+    const navigate = useNavigate()
     const [form] = Form.useForm();
     const { message } = App.useApp();
 
     const onFinish = (values) => {
-        axios.post('http://127.0.0.1:8000/users/', {
+        axios.post('http://127.0.0.1:8000/login/', {
             username: values.username,
             password: values.password,
         }).then((res) => {
             console.log("Success!", res);
             message.success('Success!');
+
+            navigate('/UserList');
         }).catch((err) => {
-            message.error('Failed to create account. ' + err.response.data.detail);
+            message.error(err.response.data.detail);
             console.log(err.response);
         });
-        //form.resetFields();
-
     };
 
-    const onFinishFailed = (errorInfo) => {
+    const onFinishFailed = (err) => {
         message.error('Please input the required information!');
-        console.log('Failed:', errorInfo);
+        console.log('Failed:', err);
     };
 
     return (
         <Form
             name="LoginForm"
-            form={form }
+            form={form}
             style={{
                 maxWidth: 600,
             }}
@@ -66,7 +68,7 @@ const UserForm = () => {
                 <Input.Password />
             </Form.Item>
 
-            {/* 
+            
             <Form.Item
                 name="remember"
                 valuePropName="checked"
@@ -76,7 +78,7 @@ const UserForm = () => {
                 }}
             >
                 <Checkbox>Remember me</Checkbox>
-            </Form.Item>*/ }
+            </Form.Item>
 
             <Form.Item
                 wrapperCol={{
@@ -92,4 +94,4 @@ const UserForm = () => {
     )
 }
 
-export default UserForm;
+export default LoginForm;

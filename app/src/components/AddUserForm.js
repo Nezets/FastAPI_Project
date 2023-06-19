@@ -1,42 +1,43 @@
 import React from 'react'
-import { Button, Checkbox, Form, Input, App } from 'antd';
+import { Button, Form, Input, App } from 'antd';
 import axios from 'axios';
 
-const EditUserForm = (req) => {
+const AddUserForm = () => {
     const [form] = Form.useForm();
     const { message } = App.useApp();
 
     const onFinish = (values) => {
-        console.log(req.req);
-        axios.put('http://127.0.0.1:8000/users/' + req.req.id, {
+        axios.post('http://127.0.0.1:8000/users/', {
             username: values.username,
-            id: req.req.id,
-            is_active: values.is_active || false,
+            password: values.password,
         }).then((res) => {
-            console.log(res);
-            message.success('Successfully updated user!');
+            console.log("Success!", res);
+            message.success('Success!');
         }).catch((err) => {
-            message.error('Failed to edit user. ' + err.response.data.detail);
-            console.log(err);
-        })
+            message.error('Failed to create account. ' + err.response.data.detail);
+            console.log(err.response);
+        });
+
     };
 
-    const onFinishFailed = (err) => {
-        message.error('Please input the required ');
-        console.log(err);
+    const onFinishFailed = (errorInfo) => {
+        message.error('Please input the required information!');
+        console.log('Failed:', errorInfo);
     };
 
     return (
         <Form
-            name="EditUserForm"
-            form={form}
+            name="AddUserForm"
+            form={form }
             style={{
                 maxWidth: 600,
+            }}
+            initialValues={{
+                remember: true,
             }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"
-            initialValues={ req.req }
         >
             <Form.Item
                 label="Username"
@@ -44,7 +45,7 @@ const EditUserForm = (req) => {
                 rules={[
                     {
                         required: true,
-                        message: 'Please input a username!',
+                        message: 'Please input your username!',
                     },
                 ]}
             >
@@ -52,16 +53,21 @@ const EditUserForm = (req) => {
             </Form.Item>
 
             <Form.Item
-                label="Active: "
-                name="is_active"
-                valuePropName="checked"
+                label="Password"
+                name="password"
+                rules={[
+                    {
+                        required: true,
+                        message: 'Please input your password!',
+                    },
+                ]}
             >
-                <Checkbox />
+                <Input.Password />
             </Form.Item>
 
             <Form.Item
                 wrapperCol={{
-                    offset: 10,
+                    offset: 8,
                     span: 16,
                 }}
             >
@@ -70,9 +76,7 @@ const EditUserForm = (req) => {
                 </Button>
             </Form.Item>
         </Form>
-
-
     )
 }
 
-export default EditUserForm;
+export default AddUserForm;

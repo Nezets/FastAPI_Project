@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+from . import login, models, schemas
+from datetime import date
 
 
 def get_user(db: Session, user_id: int):
@@ -16,8 +17,8 @@ def get_users(db: Session):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
-    fake_password = user.password + "notreallyhashed"
-    db_user = models.User(username=user.username, password=fake_password)
+    hashedPassword = login.hashPassword(user.password)
+    db_user = models.User(username=user.username, password=hashedPassword)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -43,13 +44,37 @@ def delete_user(db: Session, user_id: int):
         db.commit()
     return user
 
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Item).offset(skip).limit(limit).all()
-
-
-def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
-    db_item = models.Item(**item.dict(), owner_id=user_id)
-    db.add(db_item)
+def create_employee(db: Session, employee: schemas.Employee):
+    employee = models.Employee(firstName=employee.firstName, lastName=employee.lastName, dob=employee.dob, email=employee.email, skillLevel=employee.skillLevel, active=employee.active, age=employee.age)
+    db.add(employee)
     db.commit()
-    db.refresh(db_item)
-    return db_item
+    db.refresh(employee)
+    return employee
+
+def get_employees(db: Session):
+    employees = db.query(models.Employee).all()
+    return employees
+
+def get_employee(db: Session, employee_id: int):
+    employee = db.query(models.User).filter(models.Employee.id == employee_id).first()
+    return employee
+
+def update_employee(db: Session, employee: schemas.Employee):
+    db_employee = db.query(models.Employee).filter(models.Employee.id == employee.id).first()
+    
+    update_data = employee.dict(exclude_unset=True)
+    db_employee.filter(models.Employee.id == employee.id).update(update_data, synchronize_session=False)
+
+    db.commit()
+    db.refresh(db_employee)
+
+    return db_employee
+
+def delete_employee(db: Session, employee_id: int):
+    employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+    
+    if employee:
+        db.delete(employee)
+        db.commit()
+
+    return employee

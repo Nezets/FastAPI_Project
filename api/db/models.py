@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date
 
 from .database import Base
 
@@ -11,13 +11,16 @@ class User(Base):
     password = Column(String)
     is_active = Column(Boolean, default=True)
     
-
-
-class Item(Base):
-    __tablename__ = "items"
-
+class Employee(Base):
+    __tablename__ = "employees"
+    
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    firstName = Column(String)
+    lastName = Column(String)
+    dob = Column(Date)
+    email = Column(String)
+    skillLevel = Column(Integer)
+    active = Column(Boolean)
+    age = Column(Integer)
+
     
