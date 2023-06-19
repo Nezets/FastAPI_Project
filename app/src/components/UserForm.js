@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Checkbox, Form, Input, App } from 'antd';
+import { Button, /*Checkbox,*/ Form, Input, App } from 'antd';
 import axios from 'axios';
 
 const UserForm = () => {
@@ -7,19 +7,18 @@ const UserForm = () => {
     const { message } = App.useApp();
 
     const onFinish = (values) => {
-        console.log('Success:', values);
         axios.post('http://127.0.0.1:8000/users/', {
             username: values.username,
             password: values.password,
         }).then((res) => {
-            console.log(res);
+            console.log("Success!", res);
             message.success('Success!');
         }).catch((err) => {
-            const res = err.response;
-            message.error('Failed to create account. ' + res.data.detail);
-            console.log(res);
+            message.error('Failed to create account. ' + err.response.data.detail);
+            console.log(err.response);
         });
-        form.resetFields();
+        //form.resetFields();
+
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -30,12 +29,7 @@ const UserForm = () => {
     return (
         <Form
             name="LoginForm"
-            labelCol={{
-                span: 8,
-            }}
-            wrapperCol={{
-                span: 16,
-            }}
+            form={form }
             style={{
                 maxWidth: 600,
             }}
@@ -72,6 +66,7 @@ const UserForm = () => {
                 <Input.Password />
             </Form.Item>
 
+            {/* 
             <Form.Item
                 name="remember"
                 valuePropName="checked"
@@ -81,7 +76,7 @@ const UserForm = () => {
                 }}
             >
                 <Checkbox>Remember me</Checkbox>
-            </Form.Item>
+            </Form.Item>*/ }
 
             <Form.Item
                 wrapperCol={{

@@ -26,3 +26,6 @@ yarn-error.log*
 
 *.sqlite
 *.pyc
+*.db
+
+timeline.txt

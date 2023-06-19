@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -14,7 +14,6 @@ origins = [
     "localhost:3000"
 ]
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -23,7 +22,6 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -31,7 +29,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -46,7 +43,6 @@ def read_users(db: Session = Depends(get_db)):
     users = crud.get_users(db)
     return users
 
-
 @app.get("/users/{user_id}", response_model=schemas.User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
@@ -54,14 +50,15 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found,")
     return db_user
 
-
-
-@app.get("/items/", response_model=list[schemas.Item])
-def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    items = crud.get_items(db, skip=skip, limit=limit)
-    return items
+@app.put("/users/{user_id}")
+def update_user(user_id: int, body: dict, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_username(db, username=body['username'])
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered.")
+    user = crud.update_user( db, body['user_id'], body['username'], body['is_active'])
+    return user
 
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
-    crud.delete_user(db, user_id)
-    return
+    user = crud.delete_user(db, user_id)
+    return user

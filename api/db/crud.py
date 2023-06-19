@@ -23,11 +23,25 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
+def update_user(db: Session, user_id: int, newName: str, active: bool):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+
+    if user:
+        user.username = newName
+        user.is_active = active
+
+        db.add(user)
+        db.commit()
+
+    return user
+
 def delete_user(db: Session, user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
-    db.delete(user)
-    db.commit()
-    return
+
+    if user:
+        db.delete(user)
+        db.commit()
+    return user
 
 def get_items(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Item).offset(skip).limit(limit).all()

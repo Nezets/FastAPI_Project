@@ -1,8 +1,8 @@
 const NoPage = () => {
     return (
         <>
-            <h1>404. That's an error. </h1>
-            <h2> The requested URL was not found on this server.</h2>
+            <p><b>404</b>. That's an error.</p>
+            <p> The requested URL was not found on this server.</p>
         </>
     );
 };

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal } from 'antd';
 import axios from 'axios';
 import UserForm from './UserForm';
+import EditUserForm from './EditUserForm';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isAddModalOpen, setAddModalOpen] = useState(false);
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [curUser, setUser] = useState([]); 
 
     const fetchData = () => {
@@ -47,7 +49,7 @@ const UserList = () => {
             key: 'action',
             render: (_, record) => (
                 <>
-                    <Button> Edit </Button>
+                    <Button onClick={() => showEditModal(record) }> Edit </Button>
                     <Button onClick={() => showDeleteModal(record)} type="primary" danger>Delete</Button>
                 </>
             ),
@@ -69,6 +71,11 @@ const UserList = () => {
         setUser(record);
     };
 
+    const showEditModal = (record) => {
+        setEditModalOpen(true);
+        setUser(record)
+    }
+
     const handleOk = () => {
         setDeleteModalOpen(false);
         deleteUser();
@@ -76,17 +83,14 @@ const UserList = () => {
 
     const handleCancel = () => {
         setDeleteModalOpen(false);
+        setEditModalOpen(false);
+        setAddModalOpen(false);
+        fetchData();
     };
 
     const showAddModal = () => {
         setAddModalOpen(true);
     };
-
-    const handleAddCancel = () => {
-        setAddModalOpen(false);
-        fetchData();
-    };
-
 
     return(
         <>
@@ -95,8 +99,11 @@ const UserList = () => {
             <Modal title="Confirm Delete" open={isDeleteModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <p>Are you sure you want to delete {curUser.username}?</p>
             </Modal>
-            <Modal title="Add User" open={isAddModalOpen} onCancel={handleAddCancel} footer={null}>
+            <Modal title="Add User" open={isAddModalOpen} onCancel={handleCancel} footer={null}>
                 <UserForm/>
+            </Modal>
+            <Modal title={"Edit User " + curUser.id} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
+                <EditUserForm req={curUser} />
             </Modal>
         </>
     );
