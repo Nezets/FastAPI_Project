@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Space, Modal } from 'antd';
-import LoginForm from './LoginForm';
-import AddUserForm from './AddUserForm';
+import LoginForm from '../forms/LoginForm';
+import AddUserForm from '../forms/AddUserForm';
 
 const Login = () => {
     const [isModalOpen, setModalOpen] = useState(false);

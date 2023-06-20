@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal } from 'antd';
+import { Table, Button, Modal, Space } from 'antd';
 import axios from 'axios';
-import AddUserForm from './AddUserForm';
-import EditUserForm from './EditUserForm';
-import HomeButton from './HomeButton'; 
+
+import AddUserForm from '../forms/AddUserForm';
+import EditUserForm from '../forms/EditUserForm';
+import HomeButton from '../buttons/HomeButton'; 
+import EmployeeListButton from '../buttons/EmployeeListButton';
+
+import { PlusOutlined } from '@ant-design/icons';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -11,21 +15,6 @@ const UserList = () => {
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [curUser, setUser] = useState([]); 
-
-    const fetchData = () => {
-        axios.get('http://127.0.0.1:8000/users/')
-            .then((res) => {
-                console.log(res.data);
-                setUsers(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
-
-    useEffect(() => {
-        fetchData()
-    }, [])
 
     const columns = [
         {
@@ -46,16 +35,27 @@ const UserList = () => {
         },
         {
             title: 'Actions',
-            dataIndex: '',
-            key: 'action',
+            align: 'center',
             render: (_, record) => (
-                <>
+                <Space>
                     <Button onClick={() => showEditModal(record) }> Edit </Button>
                     <Button onClick={() => showDeleteModal(record)} type="primary" danger>Delete</Button>
-                </>
+                </Space>
             ),
         },
     ];
+
+    //API Calls
+    const fetchData = () => {
+        axios.get('http://127.0.0.1:8000/users/')
+            .then((res) => {
+                console.log(res.data);
+                setUsers(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     const deleteUser = () => {
         axios.delete('http://127.0.0.1:8000/users/' + curUser.id)
@@ -67,6 +67,12 @@ const UserList = () => {
             });
     };
 
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+
+    //Modal Functions
     const showDeleteModal = (record) => {
         setDeleteModalOpen(true);
         setUser(record);
@@ -96,8 +102,16 @@ const UserList = () => {
 
     return(
         <>
-            <Button type="primary" style={{ float: 'right' }} onClick={() => showAddModal() } >Add New User</Button>
+            <Space>
+                <HomeButton style={{ float: 'right' }} />
+                <EmployeeListButton/>
+                <Button type="primary" style={{ float: 'right' }} onClick={() => showAddModal()} >
+                    <PlusOutlined/>
+                </Button>
+            </Space>
+
             <Table dataSource={users} columns={columns} />
+
             <Modal title="Confirm Delete" open={isDeleteModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <p>Are you sure you want to delete {curUser.username}?</p>
             </Modal>
@@ -107,7 +121,6 @@ const UserList = () => {
             <Modal title={"Edit User " + curUser.id} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
                 <EditUserForm req={curUser} />
             </Modal>
-            <HomeButton style={{ float: 'right' }} />
         </>
     );
 }

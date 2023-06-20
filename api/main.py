@@ -52,7 +52,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.put("/users/{user_id}")
 def update_user(user_id: int, body: dict, db: Session = Depends(get_db), status_code=200):
-    db_user = crud.get_user_by_username(db, username=body['username'])
+    db_user = crud.get_user(db, user_id)
 
     if db_user:
         user = crud.update_user( db, body['id'], body['username'], body['is_active'])
@@ -61,13 +61,13 @@ def update_user(user_id: int, body: dict, db: Session = Depends(get_db), status_
         raise HTTPException(status_code=404, detail="User not found.")
     
 
-@app.delete("/users/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db), status_code=200):
+@app.delete("/users/{user_id}", status_code=200)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = crud.delete_user(db, user_id)
     return user
 
-@app.post("/login/")
-def login_user(user: schemas.UserCreate, db: Session = Depends(get_db), status_code=200):
+@app.post("/login/", status_code=200)
+def login_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     result = login.authenticateUser(db, user)
     if result:
         return result
@@ -83,14 +83,20 @@ def get_employees(db: Session = Depends(get_db)):
 def read_user(employee_id: int, db: Session = Depends(get_db)):
     employee = crud.get_employee(db, employee_id)
     if not employee:
-        raise HTTPException(status_code=404, detail="User not found,")
+        raise HTTPException(status_code=404, detail="Employee not found.")
     return employee
 
 @app.post("/employees/", response_model=schemas.Employee, status_code=201)
 def create_employee(employee: schemas.Employee, db: Session = Depends(get_db)):
-    return crud.create_employee(db, employee)
+    employee = crud.create_employee(db, employee)
+    return employee
 
-@app.put("/employees/", status_code=200)
-def update_employee(employee: schemas.Employee, db: Session = Depends(get_db)):
+@app.put("/employees/{employee_id}", status_code=200)
+def update_employee(employee_id: int, employee: schemas.Employee, db: Session = Depends(get_db)):
+    employee = crud.update_employee(db, employee_id, employee)
+    return employee
 
-    return crud.update_employee(db, employee)
+@app.delete("/employees/{employee_id}", status_code=200)
+def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+    employee = crud.delete_employee(db, employee_id)
+    return employee

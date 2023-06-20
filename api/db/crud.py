@@ -59,12 +59,15 @@ def get_employee(db: Session, employee_id: int):
     employee = db.query(models.User).filter(models.Employee.id == employee_id).first()
     return employee
 
-def update_employee(db: Session, employee: schemas.Employee):
-    db_employee = db.query(models.Employee).filter(models.Employee.id == employee.id).first()
+def update_employee(db: Session, employee_id: int, employee: schemas.Employee):
+    db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
     
     update_data = employee.dict(exclude_unset=True)
-    db_employee.filter(models.Employee.id == employee.id).update(update_data, synchronize_session=False)
+    
+    for key, value in update_data.items():
+        setattr(db_employee, key, value)
 
+    db.add(db_employee)
     db.commit()
     db.refresh(db_employee)
 

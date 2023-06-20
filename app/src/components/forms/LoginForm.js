@@ -16,7 +16,7 @@ const LoginForm = () => {
             console.log("Success!", res);
             message.success('Success!');
 
-            navigate('/UserList');
+            navigate('/EmployeeList');
         }).catch((err) => {
             message.error(err.response.data.detail);
             console.log(err.response);
