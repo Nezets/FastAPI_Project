@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Space } from 'antd';
 import axios from 'axios';
+import config from '../../config.json';
 
 import AddUserForm from '../forms/AddUserForm';
 import EditUserForm from '../forms/EditUserForm';
@@ -47,7 +48,7 @@ const UserList = () => {
 
     //API Calls
     const fetchData = () => {
-        axios.get('http://127.0.0.1:8000/users/')
+        axios.get(config.BACKEND_URL + '/users/')
             .then((res) => {
                 console.log(res.data);
                 setUsers(res.data);
@@ -58,7 +59,7 @@ const UserList = () => {
     };
 
     const deleteUser = () => {
-        axios.delete('http://127.0.0.1:8000/users/' + curUser.id)
+        axios.delete(config.BACKEND_URL + '/users/' + curUser.id)
             .then(() => {
                 fetchData();
             })

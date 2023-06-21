@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Space} from 'antd';
+import { Table, Button, Modal, Space, App} from 'antd';
 import axios from 'axios';
+import moment from 'moment';
+import config from '../../config.json';
 
 import AddEmployeeForm from '../forms/AddEmployeeForm';
 import EditEmployeeForm from '../forms/EditEmployeeForm';
@@ -10,6 +12,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import UserListButton from '../buttons/UserListButton';
 
 const EmployeeList = () => {
+    const { message } = App.useApp();
     const [employees, setEmployees] = useState([]);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isAddModalOpen, setAddModalOpen] = useState(false);
@@ -17,7 +20,7 @@ const EmployeeList = () => {
     const [curEmployee, setEmployee] = useState([]); 
 
     const fetchEmployees = () => {
-        axios.get('http://127.0.0.1:8000/employees/')
+        axios.get(config.BACKEND_URL+ '/employees/')
             .then((res) => {
                 console.log(res.data);
                 setEmployees(res.data);
@@ -28,12 +31,15 @@ const EmployeeList = () => {
     };
 
     const deleteEmployee = () => {
-        axios.delete('http://127.0.0.1:8000/employees/' + curEmployee.id)
+        axios.delete(config.BACKEND_URL + '/employees/' + curEmployee.id)
             .then(() => {
                 fetchEmployees();
+                message.success('Successfully deleted employee!');
             })
             .catch((err) => {
                 console.log(err);
+
+                message.success('Failed to delete employee. ' + err.response.data.detail);
             });
     }
 
@@ -107,8 +113,9 @@ const EmployeeList = () => {
     };
 
     const showEditModal = (record) => {
+        record.dob = moment(record.dob, 'YYYY-MM-DD');
+        setEmployee(record);
         setEditModalOpen(true);
-        setEmployee(record)
     };
 
     const handleCancel = () => {
@@ -132,7 +139,9 @@ const EmployeeList = () => {
                     <PlusOutlined />
                 </Button>
             </Space>
+
             <Table dataSource={employees} columns={columns} />
+
             <Modal title="Confirm Delete" open={isDeleteModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <p>Are you sure you want to delete {curEmployee.firstName + " " + curEmployee.lastName}?</p>
             </Modal>
@@ -140,7 +149,7 @@ const EmployeeList = () => {
                 <AddEmployeeForm/>
             </Modal>
             <Modal title={"Edit " + curEmployee.firstName + " " + curEmployee.lastName + "'s info"} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
-                <EditEmployeeForm data={curEmployee.id} />
+                <EditEmployeeForm data={curEmployee} />
             </Modal>
         </>
     )

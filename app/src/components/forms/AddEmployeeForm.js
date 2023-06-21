@@ -3,6 +3,8 @@ import { Button, Form, Input, App, Checkbox, DatePicker } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
 
+import config from '../../config.json';
+
 const AddEmployeeForm = () => {
     const { message } = App.useApp();
 
@@ -16,7 +18,7 @@ const AddEmployeeForm = () => {
     const onFinish = (values) => {
         values.dob = values.dob.format(dateFormat);
         const age = moment().diff(moment(values.dob, dateFormat), 'years');
-        axios.post('http://127.0.0.1:8000/employees/', {
+        axios.post(config.BACKEND_URL + '/employees/', {
             email: values.email,
             firstName: values.firstName,
             lastName: values.lastName,
@@ -26,9 +28,9 @@ const AddEmployeeForm = () => {
             age: age,
         }).then((res) => {
             console.log("Success!", res);
-            message.success('Success!');
+            message.success('Successfully added employee!');
         }).catch((err) => {
-            message.error('Failed to create account. ' + err.response.data.detail);
+            message.error('Failed to create employee. ' + err.response.data.detail);
             console.log(err.response);
         });
 
@@ -79,7 +81,8 @@ const AddEmployeeForm = () => {
                 rules={[
                     {
                         required: true,
-                        message: 'Please input an email!',
+                        message: 'Please input a valid email!',
+                        type: 'email'
                     },
                 ]}
             >

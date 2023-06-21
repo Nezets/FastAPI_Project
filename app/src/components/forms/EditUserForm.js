@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, Checkbox, Form, Input, App } from 'antd';
 import axios from 'axios';
+import config from '../../config.json';
 
 const EditUserForm = (req) => {
     const [form] = Form.useForm();
@@ -8,7 +9,7 @@ const EditUserForm = (req) => {
 
     const onFinish = (values) => {
         console.log(req.req);
-        axios.put('http://127.0.0.1:8000/users/' + req.req.id, {
+        axios.put(config.BACKEND_URL + '/users/' + req.req.id, {
             username: values.username,
             id: req.req.id,
             is_active: values.is_active || false,

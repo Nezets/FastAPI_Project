@@ -1,11 +1,15 @@
-import React from 'react'
+import React, { useEffect} from 'react'
 import { Button, Form, Input, App, Checkbox, DatePicker } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
 
+import config from '../../config.json';
+
 const EditEmployeeForm = (data) => {
     const { message } = App.useApp();
+    const [form] = Form.useForm()
 
+    const { initialValues } = data.data
     const dateFormat = 'YYYY-MM-DD';
 
     const layout = {
@@ -13,11 +17,16 @@ const EditEmployeeForm = (data) => {
         wrapperCol: { span: 16 },
     };
 
+    useEffect(() => {
+        form.resetFields()
+        form.setFieldsValue(initialValues)
+    }, [form, initialValues])
+
     const onFinish = (values) => {
-        const id = data.data;
+        const id = data.data.id;
         values.dob = values.dob.format(dateFormat);
         const age = moment().diff(moment(values.dob, dateFormat), 'years');
-        axios.put('http://127.0.0.1:8000/employees/'+id, {
+        axios.put(config.BACKEND_URL + '/employees/'+id, {
             id: id,
             email: values.email,
             firstName: values.firstName,
@@ -28,26 +37,28 @@ const EditEmployeeForm = (data) => {
             age: age,
         }).then((res) => {
             console.log("Success!", res);
-            message.success('Success!');
+            message.success('Successfully updated employee!');
         }).catch((err) => {
             message.error('Failed to create account. ' + err.response.data.detail);
             console.log(err.response);
         });
-
     };
 
     const onFinishFailed = (errorInfo) => {
+        console.log(data.data);
         message.error('Please input the required information!');
         console.log('Failed:', errorInfo);
     };
 
     return (
         <Form
+            form={form }
             name="EditEmployeeForm"
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             {...layout}
             autoComplete="off"
+            initialValues={data.data }
         >
             <Form.Item
                 label="First Name"
@@ -81,7 +92,8 @@ const EditEmployeeForm = (data) => {
                 rules={[
                     {
                         required: true,
-                        message: 'Please input an email!',
+                        message: 'Please input a valid email!',
+                        type: 'email'
                     },
                 ]}
             >

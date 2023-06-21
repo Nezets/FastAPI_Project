@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from "react-router-dom";
 import { Button, Checkbox, Form, Input, App } from 'antd';
 import axios from 'axios';
+import config from '../../config.json';
 
 const LoginForm = () => {
     const navigate = useNavigate()
@@ -9,13 +10,14 @@ const LoginForm = () => {
     const { message } = App.useApp();
 
     const onFinish = (values) => {
-        axios.post('http://127.0.0.1:8000/login/', {
+        axios.post(config.BACKEND_URL + '/login/', {
             username: values.username,
             password: values.password,
         }).then((res) => {
             console.log("Success!", res);
-            message.success('Success!');
+            message.success('Successfully logged in!');
 
+            localStorage.setItem("JWT", res.data);
             navigate('/EmployeeList');
         }).catch((err) => {
             message.error(err.response.data.detail);
@@ -32,9 +34,6 @@ const LoginForm = () => {
         <Form
             name="LoginForm"
             form={form}
-            style={{
-                maxWidth: 600,
-            }}
             initialValues={{
                 remember: true,
             }}
@@ -72,19 +71,11 @@ const LoginForm = () => {
             <Form.Item
                 name="remember"
                 valuePropName="checked"
-                wrapperCol={{
-                    offset: 8,
-                    span: 16,
-                }}
             >
                 <Checkbox>Remember me</Checkbox>
             </Form.Item>
 
             <Form.Item
-                wrapperCol={{
-                    offset: 8,
-                    span: 16,
-                }}
             >
                 <Button type="primary" htmlType="submit">
                     Submit

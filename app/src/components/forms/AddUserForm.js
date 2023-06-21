@@ -1,18 +1,19 @@
 import React from 'react'
 import { Button, Form, Input, App } from 'antd';
 import axios from 'axios';
+import config from '../../config.json';
 
 const AddUserForm = () => {
     const [form] = Form.useForm();
     const { message } = App.useApp();
 
     const onFinish = (values) => {
-        axios.post('http://127.0.0.1:8000/users/', {
+        axios.post(config.BACKEND_URL + '/users/', {
             username: values.username,
             password: values.password,
         }).then((res) => {
             console.log("Success!", res);
-            message.success('Success!');
+            message.success('Successfully created new user account!');
         }).catch((err) => {
             message.error('Failed to create account. ' + err.response.data.detail);
             console.log(err.response);
