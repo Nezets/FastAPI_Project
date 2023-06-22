@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Space, App} from 'antd';
+import { Table, Button, Modal, Space, App, Card} from 'antd';
 import axios from 'axios';
 import moment from 'moment';
+import dayjs from 'dayjs';
+
 import config from '../../config.json';
+import "../component.css";
 
 import AddEmployeeForm from '../forms/AddEmployeeForm';
 import EditEmployeeForm from '../forms/EditEmployeeForm';
@@ -17,7 +20,8 @@ const EmployeeList = () => {
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
-    const [curEmployee, setEmployee] = useState([]); 
+    const [curEmployee, setEmployee] = useState([]);
+    const dateFormat = 'YYYY-MM-DD';
 
     const fetchEmployees = () => {
         axios.get(config.BACKEND_URL+ '/employees/')
@@ -51,27 +55,32 @@ const EmployeeList = () => {
         {
             title: 'ID',
             dataIndex: 'id',
-            key: 'id'
+            key: 'id',
+            sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'First Name',
             dataIndex: 'firstName',
             key: 'firstName',
+            sorter: (a, b) => a.firstName.localeCompare(b.firstName),
         },
         {
             title: 'Last Name',
             dataIndex: 'lastName',
             key: 'lastName',
+            sorter: (a, b) => a.lastName.localeCompare(b.lastName),
         },
         {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
+            sorter: (a, b) => a.email.localeCompare(b.email),
         },
         {
             title: 'Age',
             dataIndex: 'age',
             key: 'age',
+            sorter: (a, b) => a.age - b.age,
         },
         {
             title: 'Date of Birth',
@@ -79,7 +88,7 @@ const EmployeeList = () => {
             key: 'dob',
         },
         {
-            title: 'Skills',
+            title: 'Skill Level',
             dataIndex: 'skillLevel',
             key: 'skillLevel',
         },
@@ -88,6 +97,7 @@ const EmployeeList = () => {
             dataIndex: 'active',
             key: 'active',
             render: (active) => (active ? 'Yes' : 'No'),
+            sorter: (a, b) => a.active - b.active,
         },
         {
             title: 'Actions',
@@ -113,7 +123,7 @@ const EmployeeList = () => {
     };
 
     const showEditModal = (record) => {
-        record.dob = moment(record.dob, 'YYYY-MM-DD');
+        record.dob = dayjs(record.dob, dateFormat);
         setEmployee(record);
         setEditModalOpen(true);
     };
@@ -132,6 +142,7 @@ const EmployeeList = () => {
 
     return (
         <>
+            <h1 className="Title"> Employee List </h1>
             <Space>
                 <HomeButton style={{ float: 'right' }} />
                 <UserListButton/>
@@ -139,7 +150,6 @@ const EmployeeList = () => {
                     <PlusOutlined />
                 </Button>
             </Space>
-
             <Table dataSource={employees} columns={columns} />
 
             <Modal title="Confirm Delete" open={isDeleteModalOpen} onOk={handleOk} onCancel={handleCancel}>

@@ -1,16 +1,14 @@
-import React, { useEffect} from 'react'
+import React, { useEffect } from 'react'
 import { Button, Form, Input, App, Checkbox, DatePicker } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
+import dayjs from 'dayjs'
 
 import config from '../../config.json';
 
 const EditEmployeeForm = (data) => {
     const { message } = App.useApp();
-    const [form] = Form.useForm()
-
-    const { initialValues } = data.data
-    const dateFormat = 'YYYY-MM-DD';
+    const [form] = Form.useForm();
 
     const layout = {
         labelCol: { span: 6 },
@@ -18,9 +16,16 @@ const EditEmployeeForm = (data) => {
     };
 
     useEffect(() => {
-        form.resetFields()
-        form.setFieldsValue(initialValues)
-    }, [form, initialValues])
+        data.data.dob = dayjs(data.data.dob);
+        form.resetFields();
+    }, [form, data.data])
+
+    //DatePicker variables
+    const dateFormat = 'YYYY-MM-DD';
+    const disabledDate = (current) => {
+        const futureDate = moment().add(-1, 'days') < current;
+        return futureDate;
+    }
 
     const onFinish = (values) => {
         const id = data.data.id;
@@ -110,7 +115,7 @@ const EditEmployeeForm = (data) => {
                     },
                 ]}
             >
-                <DatePicker format={dateFormat} />
+                <DatePicker format={dateFormat} disabledDate={disabledDate} defaultValue={dayjs()} />
             </Form.Item>
 
             <Form.Item

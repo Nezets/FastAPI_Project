@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button, Checkbox, Form, Input, App } from 'antd';
 import axios from 'axios';
 import config from '../../config.json';
@@ -6,6 +6,10 @@ import config from '../../config.json';
 const EditUserForm = (req) => {
     const [form] = Form.useForm();
     const { message } = App.useApp();
+
+    useEffect(() => {
+        form.resetFields();
+    }, [form, req.req])
 
     const onFinish = (values) => {
         console.log(req.req);
@@ -71,8 +75,6 @@ const EditUserForm = (req) => {
                 </Button>
             </Form.Item>
         </Form>
-
-
     )
 }
 

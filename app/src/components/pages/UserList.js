@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Space } from 'antd';
+import { Table, Button, Modal, Space, App } from 'antd';
 import axios from 'axios';
+
 import config from '../../config.json';
+import "../component.css";
 
 import AddUserForm from '../forms/AddUserForm';
 import EditUserForm from '../forms/EditUserForm';
@@ -11,6 +13,8 @@ import EmployeeListButton from '../buttons/EmployeeListButton';
 import { PlusOutlined } from '@ant-design/icons';
 
 const UserList = () => {
+    const { message } = App.useApp();
+
     const [users, setUsers] = useState([]);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isAddModalOpen, setAddModalOpen] = useState(false);
@@ -22,17 +26,20 @@ const UserList = () => {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
+            sorter: (a, b) => a.id - b.id,
         },
         {
             title: 'Username',
             dataIndex: 'username',
             key: 'username',
+            sorter: (a, b) => a.username.localeCompare(b.username),
         },
         {
             title: 'Active',
             dataIndex: 'is_active',
             key: 'is_active',
             render: (active) => (active ? 'Yes' : 'No'),
+            sorter: (a, b) => a.is_active - b.is_active,
         },
         {
             title: 'Actions',
@@ -62,8 +69,10 @@ const UserList = () => {
         axios.delete(config.BACKEND_URL + '/users/' + curUser.id)
             .then(() => {
                 fetchData();
+                message.success('Successfully deleted user!');
             })
             .catch((err) => {
+                message.error('Failed to delete user. ' + err.response.data.detail);
                 console.log(err);
             });
     };
@@ -100,9 +109,9 @@ const UserList = () => {
         setAddModalOpen(true);
     };
 
-
     return(
         <>
+            <h1 className="Title"> User List </h1>
             <Space>
                 <HomeButton style={{ float: 'right' }} />
                 <EmployeeListButton/>
@@ -119,7 +128,7 @@ const UserList = () => {
             <Modal title="Add User" open={isAddModalOpen} onCancel={handleCancel} footer={null}>
                 <AddUserForm />
             </Modal>
-            <Modal title={"Edit User " + curUser.id} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
+            <Modal title={"Edit " + curUser.username + "'s Account"} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
                 <EditUserForm req={curUser} />
             </Modal>
         </>
