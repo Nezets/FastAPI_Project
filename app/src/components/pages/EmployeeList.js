@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Space, App, Card} from 'antd';
+import { Table, Button, Modal, Space, App, notification } from 'antd';
 import axios from 'axios';
-import moment from 'moment';
 import dayjs from 'dayjs';
 
 import config from '../../config.json';
@@ -13,6 +12,9 @@ import EditEmployeeForm from '../forms/EditEmployeeForm';
 import HomeButton from '../buttons/HomeButton'; 
 import { PlusOutlined } from '@ant-design/icons';
 import UserListButton from '../buttons/UserListButton';
+import { WarningTwoTone, setTwoToneColor } from '@ant-design/icons';
+
+setTwoToneColor('red');
 
 const EmployeeList = () => {
     const { message } = App.useApp();
@@ -22,15 +24,19 @@ const EmployeeList = () => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [curEmployee, setEmployee] = useState([]);
     const dateFormat = 'YYYY-MM-DD';
+    const [errAlert, contextHolder] = notification.useNotification();
 
     const fetchEmployees = () => {
-        axios.get(config.BACKEND_URL+ '/employees/')
+        const token = localStorage.getItem('token');
+        console.log(token);
+        axios.get(config.BACKEND_URL + '/employees/', token)
             .then((res) => {
                 console.log(res.data);
                 setEmployees(res.data);
             })
             .catch((err) => {
                 console.log(err);
+                openNotification(err.response.data.detail);
             });
     };
 
@@ -49,6 +55,9 @@ const EmployeeList = () => {
 
     useEffect(() => {
         fetchEmployees()
+
+        //Removing warning from eslint
+        // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, [])
 
     const columns = [
@@ -140,6 +149,17 @@ const EmployeeList = () => {
         deleteEmployee();
     };
 
+    const openNotification = (errMsg) => {
+        errAlert.destroy();
+        errAlert.info({
+            message: `Error Alert`,
+            description: errMsg,
+            placement: 'top',
+            duration: 0,
+            icon: <WarningTwoTone />,
+        });
+    };
+
     return (
         <>
             <h1 className="Title"> Employee List </h1>
@@ -152,13 +172,32 @@ const EmployeeList = () => {
             </Space>
             <Table dataSource={employees} columns={columns} />
 
-            <Modal title="Confirm Delete" open={isDeleteModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <Modal
+                title="Confirm Delete"
+                open={isDeleteModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                okText='Confirm'
+                okButtonProps={{ style: { backgroundColor: 'red' } }} 
+            >
                 <p>Are you sure you want to delete {curEmployee.firstName + " " + curEmployee.lastName}?</p>
             </Modal>
-            <Modal title="Add Employee" open={isAddModalOpen} onCancel={handleCancel} footer={null}>
+
+            <Modal
+                title="Add Employee"
+                open={isAddModalOpen}
+                onCancel={handleCancel}
+                footer={null}
+            >
                 <AddEmployeeForm/>
             </Modal>
-            <Modal title={"Edit " + curEmployee.firstName + " " + curEmployee.lastName + "'s info"} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
+
+            <Modal
+                title={"Edit " + curEmployee.firstName + " " + curEmployee.lastName + "'s info"}
+                open={isEditModalOpen}
+                onCancel={handleCancel}
+                footer={null}
+            >
                 <EditEmployeeForm data={curEmployee} />
             </Modal>
         </>

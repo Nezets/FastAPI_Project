@@ -17,7 +17,7 @@ const LoginForm = () => {
             console.log("Success!", res);
             message.success('Successfully logged in!');
 
-            localStorage.setItem("JWT", res.data);
+            localStorage.setItem("token", res.data);
             navigate('/EmployeeList');
         }).catch((err) => {
             message.error(err.response.data.detail);

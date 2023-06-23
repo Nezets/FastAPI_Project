@@ -78,8 +78,8 @@ const UserList = () => {
     };
 
     useEffect(() => {
-        fetchData()
-    }, [])
+        fetchData();
+    }, []) 
 
 
     //Modal Functions
@@ -122,13 +122,32 @@ const UserList = () => {
 
             <Table dataSource={users} columns={columns} />
 
-            <Modal title="Confirm Delete" open={isDeleteModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <Modal
+                title="Confirm Delete"
+                open={isDeleteModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                okText='Confirm'
+                okButtonProps={{ style: { backgroundColor: 'red' } }} 
+            >
                 <p>Are you sure you want to delete {curUser.username}?</p>
             </Modal>
-            <Modal title="Add User" open={isAddModalOpen} onCancel={handleCancel} footer={null}>
+
+            <Modal
+                title="Add User"
+                open={isAddModalOpen}
+                onCancel={handleCancel}
+                footer={null}
+            >
                 <AddUserForm />
             </Modal>
-            <Modal title={"Edit " + curUser.username + "'s Account"} open={isEditModalOpen} onCancel={handleCancel} footer={null}>
+
+            <Modal
+                title={"Edit " + curUser.username + "'s Account"}
+                open={isEditModalOpen}
+                onCancel={handleCancel}
+                footer={null}
+            >
                 <EditUserForm req={curUser} />
             </Modal>
         </>
