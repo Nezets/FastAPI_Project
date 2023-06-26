@@ -17,6 +17,8 @@ Run the frontend server by running the following command in the `app` folder:
 npm start
 ```
 
+For the Python dependencies, install FastAPI, SQLAlchemy, python-jose, and pydantic using `pip install`
+
 Run the backend server by running the following command in the `api` folder:
 ```
 py -m uvicorn main:app
