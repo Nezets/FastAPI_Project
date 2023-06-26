@@ -14,7 +14,6 @@ const LoginForm = () => {
             username: values.username,
             password: values.password,
         }).then((res) => {
-            console.log("Success!", res);
             message.success('Successfully logged in!');
 
             localStorage.setItem("token", res.data);

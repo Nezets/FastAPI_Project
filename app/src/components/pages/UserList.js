@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Table, Button, Modal, Space, App } from 'antd';
 import axios from 'axios';
 
@@ -13,6 +14,7 @@ import EmployeeListButton from '../buttons/EmployeeListButton';
 import { PlusOutlined } from '@ant-design/icons';
 
 const UserList = () => {
+    const navigate = useNavigate();
     const { message } = App.useApp();
 
     const [users, setUsers] = useState([]);
@@ -55,30 +57,35 @@ const UserList = () => {
 
     //API Calls
     const fetchData = () => {
-        axios.get(config.BACKEND_URL + '/users/')
+        const token = localStorage.getItem('token');
+        axios.get(config.BACKEND_URL + '/users/', { headers: { "Authorization": `Bearer ${token}` } })
             .then((res) => {
-                console.log(res.data);
                 setUsers(res.data);
             })
             .catch((err) => {
                 console.log(err);
+                message.error('Please login to access this page. ');
+                navigate('/');
             });
     };
 
     const deleteUser = () => {
-        axios.delete(config.BACKEND_URL + '/users/' + curUser.id)
+        const token = localStorage.getItem('token');
+        axios.delete(config.BACKEND_URL + '/users/' + curUser.id, { headers: { "Authorization": `Bearer ${token}` } })
             .then(() => {
                 fetchData();
                 message.success('Successfully deleted user!');
             })
             .catch((err) => {
-                message.error('Failed to delete user. ' + err.response.data.detail);
                 console.log(err);
+                message.error('Failed to delete employee. ' + err.response.data.detail);
             });
     };
 
     useEffect(() => {
         fetchData();
+        //Removing warning from eslint
+        // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, []) 
 
 

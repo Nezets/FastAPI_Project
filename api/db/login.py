@@ -8,6 +8,7 @@ from jose import JWTError, jwt
 import hashlib
 
 from . import models, schemas, userFunctions
+from db.database import SessionLocal, engine
 
 env = dotenv_values(".env")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -33,28 +34,38 @@ def authenticateUser(db: Session, user: schemas.UserCreate):
     
     hashedPassword = hashPassword(user.password)
     if result and hashedPassword == result.password:
-        token = create_access_token({"name": user.username})
+        token = create_access_token({"sub": user.username})
         return token
     else:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-async def get_current_user(db: Session, token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
     )
 
     try:
-        payload = jwt.decode(token, env["SECRET_KEY"], algorithm=env["ALGORITHM"])
+        payload = jwt.decode(token, env["SECRET_KEY"])
         username: str = payload.get("sub")
         if username is None:
-            raise credentials_exception
-        token_data = models.TokenData(username=username)
+            raise HTTPException(status_code=401, detail="User not found in database.")
     except JWTError:
         raise credentials_exception
 
-    user = userFunctions.get_user(db, username=token_data.username)
-    if user is None:
-        raise credentials_exception
+    return username
 
-    return user
+def verify_token(token: str):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Failed to validate credentials.",
+    )
+
+    try:
+        payload = jwt.decode(token, env["SECRET_KEY"], algorithm=env["ALGORITHM"])
+        if payload:
+            return True
+        else:
+            raise credentials_exception
+    except:
+        raise credentials_exception

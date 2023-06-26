@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Space, App, notification } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { Table, Button, Modal, Space, App } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
@@ -12,11 +13,9 @@ import EditEmployeeForm from '../forms/EditEmployeeForm';
 import HomeButton from '../buttons/HomeButton'; 
 import { PlusOutlined } from '@ant-design/icons';
 import UserListButton from '../buttons/UserListButton';
-import { WarningTwoTone, setTwoToneColor } from '@ant-design/icons';
-
-setTwoToneColor('red');
 
 const EmployeeList = () => {
+    const navigate = useNavigate()
     const { message } = App.useApp();
     const [employees, setEmployees] = useState([]);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -24,24 +23,25 @@ const EmployeeList = () => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [curEmployee, setEmployee] = useState([]);
     const dateFormat = 'YYYY-MM-DD';
-    const [errAlert, contextHolder] = notification.useNotification();
 
     const fetchEmployees = () => {
         const token = localStorage.getItem('token');
-        console.log(token);
-        axios.get(config.BACKEND_URL + '/employees/', token)
+        axios.get(config.BACKEND_URL + '/employees/', {
+            headers: { "Authorization": `Bearer ${token}` },
+        })
             .then((res) => {
-                console.log(res.data);
                 setEmployees(res.data);
             })
             .catch((err) => {
                 console.log(err);
-                openNotification(err.response.data.detail);
+                message.error('Please login to access this page. ');
+                navigate('/');
             });
     };
 
     const deleteEmployee = () => {
-        axios.delete(config.BACKEND_URL + '/employees/' + curEmployee.id)
+        const token = localStorage.getItem('token');
+        axios.delete(config.BACKEND_URL + '/employees/' + curEmployee.id, { headers: { "Authorization": `Bearer ${token}` } })
             .then(() => {
                 fetchEmployees();
                 message.success('Successfully deleted employee!');
@@ -49,7 +49,7 @@ const EmployeeList = () => {
             .catch((err) => {
                 console.log(err);
 
-                message.success('Failed to delete employee. ' + err.response.data.detail);
+                message.error('Failed to delete employee. ' + err.response.data.detail);
             });
     }
 
@@ -149,16 +149,6 @@ const EmployeeList = () => {
         deleteEmployee();
     };
 
-    const openNotification = (errMsg) => {
-        errAlert.destroy();
-        errAlert.info({
-            message: `Error Alert`,
-            description: errMsg,
-            placement: 'top',
-            duration: 0,
-            icon: <WarningTwoTone />,
-        });
-    };
 
     return (
         <>

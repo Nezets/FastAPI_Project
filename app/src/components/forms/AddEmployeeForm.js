@@ -16,8 +16,10 @@ const AddEmployeeForm = () => {
     };
 
     const onFinish = (values) => {
+        const token = localStorage.getItem('token');
         values.dob = values.dob.format(dateFormat);
         const age = moment().diff(moment(values.dob, dateFormat), 'years');
+
         axios.post(config.BACKEND_URL + '/employees/', {
             email: values.email,
             firstName: values.firstName,
@@ -26,6 +28,8 @@ const AddEmployeeForm = () => {
             skillLevel: values.skillLevel,
             active: values.active || false,
             age: age,
+        }, {
+            headers: { "Authorization": `Bearer ${token}` }, 
         }).then((res) => {
             console.log("Success!", res);
             message.success('Successfully added employee!');

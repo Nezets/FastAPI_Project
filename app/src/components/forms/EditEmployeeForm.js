@@ -29,6 +29,7 @@ const EditEmployeeForm = (data) => {
 
     //Submit Form and make API call to create new employee in Database
     const onFinish = (values) => {
+        const token = localStorage.getItem('token');
         const id = data.data.id;
         values.dob = values.dob.format(dateFormat);
         const age = moment().diff(moment(values.dob, dateFormat), 'years');
@@ -41,6 +42,8 @@ const EditEmployeeForm = (data) => {
             skillLevel: values.skillLevel,
             active: values.active || false,
             age: age,
+        }, {
+            headers: { "Authorization": `Bearer ${token}` },
         }).then((res) => {
             console.log("Success!", res);
             message.success('Successfully updated employee!');

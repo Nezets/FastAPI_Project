@@ -12,11 +12,13 @@ const EditUserForm = (req) => {
     }, [form, req.req])
 
     const onFinish = (values) => {
-        console.log(req.req);
+        const token = localStorage.getItem('token');
         axios.put(config.BACKEND_URL + '/users/' + req.req.id, {
             username: values.username,
             id: req.req.id,
             is_active: values.is_active || false,
+        }, {
+            headers: { "Authorization": `Bearer ${token}` }, 
         }).then((res) => {
             console.log(res);
             message.success('Successfully updated user!');
